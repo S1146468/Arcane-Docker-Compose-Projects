@@ -13,25 +13,11 @@ services:
         ipv4_address: 10.12.144.6
 
     volumes:
-      - type: volume
-        source: nginx-volume
-        target: /data
-        volume:
-          subpath: data
-
-      - type: volume
-        source: nginx-volume
-        target: /etc/letsencrypt
-        volume:
-          subpath: letsencrypt
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
 
     environment:
-      TZ: Amsterdam/Europe
-
-volumes:
-  nginx-volume:
-    name: nginx-volume
-    driver: local
+      TZ: Europe/Amsterdam
 
 networks:
   macvlan:
