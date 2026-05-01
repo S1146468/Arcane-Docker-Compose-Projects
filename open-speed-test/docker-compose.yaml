@@ -1,0 +1,25 @@
+services:
+  speedtest:
+    image: openspeedtest/latest
+    container_name: openspeedtest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - type: volume
+        source: openspeedtest-volume
+        target: /app
+        volume:
+          subpath: app
+
+      - type: volume
+        source: openspeedtest-volume
+        target: /var/log/letsencrypt
+        volume:
+          subpath: letsencrypt-logs
+
+volumes:
+  openspeedtest-volume:
+    name: open-speed-test-volume
+    driver: local
