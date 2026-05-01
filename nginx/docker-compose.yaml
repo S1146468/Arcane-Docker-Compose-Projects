@@ -13,12 +13,16 @@ services:
         ipv4_address: 10.12.144.6
 
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - nginx-volume/data:/data
+      - nginx-volume/letsencrypt:/etc/letsencrypt
 
     environment:
       TZ: Europe/Amsterdam
 
 networks:
   macvlan:
+    external: true
+
+volumes:
+  nginx-volume:
     external: true
