@@ -23,3 +23,4 @@ volumes:
   openspeedtest-volume:
     name: open-speed-test-volume
     driver: local
+

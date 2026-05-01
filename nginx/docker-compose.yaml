@@ -1,0 +1,38 @@
+services:
+  nginx:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_service
+    restart: unless-stopped
+
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+
+    networks:
+      macvlan:
+        ipv4_address: 10.12.144.6
+
+    volumes:
+      - type: volume
+        source: nginx-volume
+        target: /data
+        volume:
+          subpath: data
+
+      - type: volume
+        source: nginx-volume
+        target: /etc/letsencrypt
+        volume:
+          subpath: letsencrypt
+
+    environment:
+      TZ: Amsterdam/Europe
+
+volumes:
+  nginx-volume:
+    name: nginx-volume
+    driver: local
+
+networks:
+  macvlan:
+    external: true
