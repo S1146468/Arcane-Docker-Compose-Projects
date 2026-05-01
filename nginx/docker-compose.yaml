@@ -13,8 +13,8 @@ services:
         ipv4_address: 10.12.144.6
 
     volumes:
-      - nginx-volume/data:/data
-      - nginx-volume/letsencrypt:/etc/letsencrypt
+      - /etc/arcane/projects/nginx/data:/data
+      - /etc/arcane/projects/nginx/letsencrypt:/etc/letsencrypt
 
     environment:
       TZ: Europe/Amsterdam
@@ -26,3 +26,7 @@ networks:
 volumes:
   nginx-volume:
     external: true
+
+
+
+    
