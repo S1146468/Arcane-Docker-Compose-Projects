@@ -3,14 +3,18 @@ services:
     container_name: homarr
     image: ghcr.io/homarr-labs/homarr:latest
     restart: unless-stopped
-    env: .env
+
+    env_file:
+      - .env
+
     volumes:
-      #- /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
       - homarr-volume:/appdata
-    environment:
-      - ${ENV}
+
     ports:
-      - '7575:7575'
+      - "7575:7575"
+
+    networks:
+      - homarr-network
 
 volumes:
   homarr-volume:
@@ -18,4 +22,3 @@ volumes:
 networks:
   homarr-network:
     driver: bridge
-
