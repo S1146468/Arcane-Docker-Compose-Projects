@@ -22,7 +22,4 @@ services:
 networks:
   macvlan:
     external: true
-
-
-
     
