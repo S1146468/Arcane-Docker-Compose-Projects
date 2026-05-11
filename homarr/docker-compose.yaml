@@ -1,0 +1,24 @@
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    volumes:
+      - homarr-volume:/appdata
+
+    ports:
+      - "7575:7575"
+
+    networks:
+      - homarr-network
+
+volumes:
+  homarr-volume:
+
+networks:
+  homarr-network:
+    driver: bridge
