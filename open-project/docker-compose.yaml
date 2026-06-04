@@ -10,38 +10,38 @@ x-op-restart-policy: &restart_policy
   restart: unless-stopped
 
 x-op-image: &op_image
-  image: openproject/openproject:${OPENPROJECT_TAG}
+  image: openproject/openproject:${OPENPROJECT_TAG:-17-slim}
 
 x-op-app: &op_app
   <<: [*op_image, *restart_policy]
   environment:
-    OPENPROJECT_HTTPS: "${OPENPROJECT_HTTPS}"
-    OPENPROJECT_HOST__NAME: "${OPENPROJECT_HOST__NAME}"
+    OPENPROJECT_HTTPS: "${OPENPROJECT_HTTPS:-false}"
+    OPENPROJECT_HOST__NAME: "${OPENPROJECT_HOST__NAME:-localhost}"
     OPENPROJECT_ADDITIONAL__HOST__NAMES: "web"
-    OPENPROJECT_HSTS: "${OPENPROJECT_HSTS}"
+    OPENPROJECT_HSTS: "${OPENPROJECT_HSTS:-false}"
     OPENPROJECT_RAILS__CACHE__STORE: "memcache"
     OPENPROJECT_CACHE__MEMCACHE__SERVER: "cache:11211"
-    OPENPROJECT_RAILS__RELATIVE__URL__ROOT: "${OPENPROJECT_RAILS__RELATIVE__URL__ROOT}"
-    OPENPROJECT_COLLABORATIVE__EDITING__HOCUSPOCUS__URL: "${COLLABORATIVE_SERVER_URL}"
+    OPENPROJECT_RAILS__RELATIVE__URL__ROOT: "${OPENPROJECT_RAILS__RELATIVE__URL__ROOT:-}"
+    OPENPROJECT_COLLABORATIVE__EDITING__HOCUSPOCUS__URL: "${COLLABORATIVE_SERVER_URL:-ws://localhost:8080/hocuspocus}"
     OPENPROJECT_COLLABORATIVE__EDITING__HOCUSPOCUS__SECRET: "${COLLABORATIVE_SERVER_SECRET}"
     DATABASE_URL: "${DATABASE_URL}"
-    RAILS_MIN_THREADS: "${RAILS_MIN_THREADS}"
-    RAILS_MAX_THREADS: "${RAILS_MAX_THREADS}"
-    IMAP_ENABLED: "${IMAP_ENABLED}"
+    RAILS_MIN_THREADS: "${RAILS_MIN_THREADS:-4}"
+    RAILS_MAX_THREADS: "${RAILS_MAX_THREADS:-16}"
+    IMAP_ENABLED: "${IMAP_ENABLED:-false}"
     SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
   volumes:
-    - "${OPDATA}:/var/openproject/assets"
+    - openproject-opdata:/var/openproject/assets
 
 services:
   db:
-    image: postgres:${POSTGRES_VERSION}
+    image: postgres:${POSTGRES_VERSION:-17}
     <<: *restart_policy
     stop_grace_period: 10s
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_DB: openproject
     volumes:
-      - "${PGDATA}:/var/lib/postgresql/data"
+      - openproject-pgdata:/var/lib/postgresql/data
     networks:
       - openproject-backend
     healthcheck:
@@ -64,7 +64,7 @@ services:
     image: openproject/proxy
     <<: *restart_policy
     ports:
-      - "${PORT}:80"
+      - "${PORT:-127.0.0.1:8080}:80"
     depends_on:
       web:
         condition: service_healthy
@@ -86,7 +86,7 @@ services:
       - openproject-frontend
       - openproject-backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080${OPENPROJECT_RAILS__RELATIVE__URL__ROOT}/health_checks/default"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080${OPENPROJECT_RAILS__RELATIVE__URL__ROOT:-}/health_checks/default"]
       interval: 10s
       timeout: 3s
       retries: 10
@@ -131,12 +131,12 @@ services:
       - openproject-backend
 
   hocuspocus:
-    image: openproject/hocuspocus:${HOCUSPOCUS_TAG}
+    image: openproject/hocuspocus:${HOCUSPOCUS_TAG:-17.4.0}
     <<: *restart_policy
     environment:
       SECRET: "${COLLABORATIVE_SERVER_SECRET}"
       OPENPROJECT_URL: "http://web:8080"
-      OPENPROJECT_HTTPS: "${OPENPROJECT_HTTPS}"
+      OPENPROJECT_HTTPS: "${OPENPROJECT_HTTPS:-false}"
     depends_on:
       web:
         condition: service_healthy
