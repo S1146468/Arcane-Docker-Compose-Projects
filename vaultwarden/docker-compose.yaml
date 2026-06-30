@@ -10,7 +10,8 @@ services:
     - type: volume
       source: vaultwarden-volume
       target: /data
-      volume:
-        subpath: data
     ports:
       - 11001:80 # you can replace the 11001 with your preferred port
+
+volumes:
+  vaultwarden-volume:
