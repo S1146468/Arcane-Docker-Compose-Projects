@@ -7,7 +7,10 @@ services:
     restart: unless-stopped
 
     ports:
-    - "${STIRLING_BIND_IP:-10.12.144.3}:${STIRLING_PORT:-8080}:8080"
+    - target: 8080
+      published: "${STIRLING_HOST_PORT:-8080}"
+      host_ip: "${STIRLING_BIND_IP:-10.12.144.3}"
+      protocol: tcp
 
     environment:
       TZ: ${TZ:-Europe/Amsterdam}
