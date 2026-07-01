@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   gitingest:
     image: ghcr.io/coderamp-labs/gitingest:latest
@@ -9,4 +10,4 @@ services:
     env_file:
       - .env
     environment:
-      ALLOWED_HOSTS: ${ENV_ALLOWED_HOSTS}
+      ALLOWED_HOSTS: "${ENV_ALLOWED_HOSTS:-localhost}"
