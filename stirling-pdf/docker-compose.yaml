@@ -2,7 +2,7 @@ name: stirling-pdf
 
 services:
   stirling-pdf:
-    image: stirlingtools/stirling-pdf:latest-fat
+    image: stirlingtools/stirling-pdf:latest
     container_name: stirling-pdf
     restart: unless-stopped
 
