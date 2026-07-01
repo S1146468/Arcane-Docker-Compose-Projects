@@ -5,10 +5,13 @@ services:
     restart: unless-stopped
 
     ports:
-      - "${VERT_BIND_IP:?VERT_BIND_IP is not set}:${VERT_HOST_PORT:?VERT_HOST_PORT is not set}:80"
+      - target: 80
+        published: "${VERT_HOST_PORT:-5173}"
+        host_ip: "${VERT_BIND_IP:-10.12.144.3}"
+        protocol: tcp
 
     environment:
-      TZ: ${TZ:-Europe/Amsterdam}
+      TZ: "${TZ:-Europe/Amsterdam}"
 
     security_opt:
       - no-new-privileges:true
