@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "${STIRLING_PORT_MAPPING:?set STIRLING_PORT_MAPPING in .env}"
+      - "${STIRLING_PORT_MAPPING}"
 
     environment:
       TZ: ${TZ:-Europe/Amsterdam}
