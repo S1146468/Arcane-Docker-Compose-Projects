@@ -92,10 +92,6 @@ services:
 
     pids_limit: 512
     mem_limit: 4g
-    cpus: 1.75
-
-    pids_limit: 512
-    mem_limit: 4g
 
     # Use 1.75 if this machine also runs other services.
     # Use 2.0 only if you accept Stirling using both available cores during heavy jobs.
