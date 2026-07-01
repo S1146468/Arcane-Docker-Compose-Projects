@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  gitingest:
+    image: ghcr.io/coderamp-labs/gitingest:latest
+    container_name: gitingest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      ALLOWED_HOSTS: ${ENV_ALLOWED_HOSTS}

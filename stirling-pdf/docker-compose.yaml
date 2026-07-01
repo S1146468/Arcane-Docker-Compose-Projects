@@ -1,0 +1,104 @@
+name: stirling-pdf
+
+services:
+  stirling-pdf:
+    image: stirlingtools/stirling-pdf:latest-fat
+    container_name: stirling-pdf
+    restart: unless-stopped
+
+    ports:
+      - "${STIRLING_PORT_MAPPING:?set STIRLING_PORT_MAPPING in .env}"
+
+    environment:
+      TZ: ${TZ:-Europe/Amsterdam}
+
+      # Keep full/auth features enabled.
+      DISABLE_ADDITIONAL_FEATURES: "false"
+
+      # Login/security
+      SECURITY_ENABLELOGIN: "true"
+      SECURITY_INITIALLOGIN_USERNAME: ${STIRLING_ADMIN_USER:?set STIRLING_ADMIN_USER in .env}
+      SECURITY_INITIALLOGIN_PASSWORD: ${STIRLING_ADMIN_PASSWORD:?set STIRLING_ADMIN_PASSWORD in .env}
+
+      # UI / system
+      SYSTEM_DEFAULTLOCALE: ${SYSTEM_DEFAULTLOCALE:-en-GB}
+      SYSTEM_GOOGLEVISIBILITY: "false"
+      SYSTEM_ROOTURIPATH: "/"
+      SYSTEM_FRONTENDURL: ${STIRLING_FRONTEND_URL:?set STIRLING_FRONTEND_URL in .env}
+      SYSTEM_CORSALLOWEDORIGINS: ${STIRLING_FRONTEND_URL:?set STIRLING_FRONTEND_URL in .env}
+      SYSTEMFILEUPLOADLIMIT: ${STIRLING_FILE_UPLOAD_LIMIT:-2000MB}
+
+      # Intel N150 / 2-core tuning
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx2g"
+
+      # Conservative process limits.
+      # Stirling docs say extra requests queue when session limits are hit.
+      PROCESSEXECUTOR_SESSIONLIMIT_LIBREOFFICESESSIONLIMIT: "1"
+      PROCESSEXECUTOR_SESSIONLIMIT_TESSERACTSESSIONLIMIT: "1"
+      PROCESSEXECUTOR_SESSIONLIMIT_PDFTOHTMLSESSIONLIMIT: "1"
+      PROCESSEXECUTOR_SESSIONLIMIT_QPDFSESSIONLIMIT: "1"
+      PROCESSEXECUTOR_SESSIONLIMIT_OCRMYPDFSESSIONLIMIT: "1"
+      PROCESSEXECUTOR_SESSIONLIMIT_GHOSTSCRIPTSESSIONLIMIT: "2"
+      PROCESSEXECUTOR_SESSIONLIMIT_IMAGEMAGICKSESSIONLIMIT: "2"
+      PROCESSEXECUTOR_SESSIONLIMIT_PYTHONOPENCVSESSIONLIMIT: "2"
+      PROCESSEXECUTOR_SESSIONLIMIT_WEASYPRINTSESSIONLIMIT: "2"
+
+    volumes:
+    - type: volume
+      source: stirling-pdf-volume
+      target: /usr/share/tessdata
+      volume:
+        subpath: tessdata
+    
+    - type: volume
+      source: stirling-pdf-volume
+      target: /configs
+      volume:
+        subpath: configs
+
+    - type: volume
+      source: stirling-pdf-volume
+      target: /logs
+      volume:
+        subpath: logs
+
+    - type: volume
+      source: stirling-pdf-volume
+      target: /customFiles
+      volume:
+        subpath: customFiles
+
+    - type: volume
+      source: stirling-pdf-volume
+      target: /pipeline
+      volume:
+        subpath: pipeline
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/api/v1/info/status | grep -q 'UP' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    pids_limit: 512
+    mem_limit: 4g
+
+    # Use 1.75 if this machine also runs other services.
+    # Use 2.0 only if you accept Stirling using both available cores during heavy jobs.
+    cpus: 1.75
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  stirling-pdf-volume:
